@@ -37,7 +37,7 @@ public class FeedAdaptor extends ArrayAdapter<Feed> {
         }
         Feed f = mObjects.get(position);
         ImageView imageView = (ImageView)convertView.findViewById(R.id.imageViewNasa);
-        Picasso.with(mContext).load(f.getLink()).resize(100,100).into(imageView);
+        Picasso.with(mContext).load(f.getImageLink()).resize(100,100).into(imageView);
 
         TextView tvTitle = (TextView)convertView.findViewById(R.id.textViewTitle);
         tvTitle.setText(f.getTitle());

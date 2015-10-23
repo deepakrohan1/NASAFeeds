@@ -65,7 +65,7 @@ public class FeedParser {
             if ((localName.equals("item"))|| (localName.equals("channel"))) {
                 feeds = new Feed();
             } else if (localName.equals("enclosure")) {
-                feeds.setLink(attributes.getValue("url"));
+                feeds.setImageLink(attributes.getValue("url"));
             }
         }
 

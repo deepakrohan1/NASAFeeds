@@ -21,18 +21,19 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AsyncDTTrends.showData {
 
     ListView listView;
+    String typeFeeds = "NASA";
     public static final String FEED_SENT="feedsent";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         listView = (ListView)findViewById(R.id.listView);
-
-        
         new NASAFeedParser().execute("http://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss");
+
+
 
     }
 
@@ -49,13 +50,43 @@ public class MainActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id){
+            case R.id.imageViewNasa:
+                typeFeeds = "NASA";
+                new NASAFeedParser().execute("http://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss");
+                return true;
+            case R.id.dt_computer:
+                typeFeeds="DTCOMP";
+                new AsyncDTTrends(MainActivity.this).execute("http://www.digitaltrends.com/computing/feed/");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
 
-        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void showsFeeds(final ArrayList<Feed> feeds) {
+        if(feeds == null){
+            Log.d("ap","error");
+        }else{
+            for(Feed f : feeds){
+                Log.d("ap",f.toString());
+            }
+
+            FeedAdaptor feedAdaptor = new FeedAdaptor(MainActivity.this,R.layout.nasa_main,feeds);
+            listView.setAdapter(feedAdaptor);
+
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Feed feed = feeds.get(position);
+                    Intent i = new Intent(MainActivity.this,ViewActivity.class);
+                    i.putExtra(FEED_SENT,feed);
+                    startActivity(i);
+                }
+            });
+        }
     }
 
 
@@ -91,10 +122,10 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(final ArrayList<Feed> feeds) {
             super.onPostExecute(feeds);
             if (feeds.size() == 0) {
-                Log.d("Demo", "Err");
+                Log.d("ap", "Err");
             } else {
                 for (Feed f : feeds) {
-                    Log.d("Demo", f.toString());
+                    Log.d("ap", f.toString());
                 }
 
                 FeedAdaptor adaptor = new FeedAdaptor(MainActivity.this,R.layout.nasa_main,feeds);

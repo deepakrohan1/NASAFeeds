@@ -4,4 +4,17 @@
     tools:context="com.example.rohan.nasafeeds.ViewActivity">
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
+
+    <item android:id="@+id/nasa_image"
+        android:icon="@drawable/comp"
+        android:title="Nasa Image"
+        android:orderInCategory="100"
+        app:showAsAction="collapseActionView"/>
+
+    <item android:id="@+id/dt_computer"
+        android:icon="@drawable/comp"
+        android:title="Computers"
+        android:orderInCategory="100"
+        app:showAsAction="collapseActionView"/>
+
 </menu>

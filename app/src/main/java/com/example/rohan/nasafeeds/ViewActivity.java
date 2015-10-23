@@ -11,6 +11,7 @@ import com.squareup.picasso.Picasso;
 
 public class ViewActivity extends AppCompatActivity {
 TextView tvTitle;
+TextView tvDesc;
     ImageView imDetailed;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,11 +20,15 @@ TextView tvTitle;
 
         tvTitle = (TextView) findViewById(R.id.textViewTitle);
         imDetailed = (ImageView)findViewById(R.id.imageViewDetailed);
+        tvDesc = (TextView)findViewById(R.id.textViewDesc);
 
         if(getIntent().getExtras()!=null){
             Feed f = (Feed) getIntent().getExtras().getSerializable(MainActivity.FEED_SENT);
             tvTitle.setText(f.getTitle());
-            Picasso.with(this).load(f.getLink()).into(imDetailed);
+            if(!f.getDescription().equals(null)){
+                tvDesc.setText(f.getDescription());
+            }
+            Picasso.with(this).load(f.getImageLink()).into(imDetailed);
         }
     }
 

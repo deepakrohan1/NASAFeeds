@@ -17,6 +17,15 @@ public class Feed implements Serializable {
      **/
 
     private String title, date, link, description, imageLink;
+    private long id;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getImageLink() {
         return imageLink;
@@ -66,6 +75,7 @@ public class Feed implements Serializable {
                 ", link='" + link + '\'' +
                 ", description='" + description + '\'' +
                 ", imageLink='" + imageLink + '\'' +
+                ", id=" + id +
                 '}';
     }
 }

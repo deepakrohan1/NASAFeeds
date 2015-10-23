@@ -41,7 +41,8 @@
             android:id="@+id/textViewDesc"
             android:layout_below="@+id/imageViewDetailed"
             android:layout_alignEnd="@+id/textViewTitle"
-            android:layout_marginTop="44dp" />
+            android:layout_marginTop="44dp"
+            android:autoLink="web"/>
 
     </LinearLayout>
     </ScrollView>

@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.xml.sax.SAXException;
 
@@ -21,11 +22,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AsyncDTTrends.showData {
-
+    List<Feed> feedsSaved;
     ListView listView;
     String typeFeeds = "NASA";
+    FeedDataManager dm;
     public static final String FEED_SENT="feedsent";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +37,14 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
         listView = (ListView)findViewById(R.id.listView);
         new NASAFeedParser().execute("http://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss");
 
+        dm = new FeedDataManager(this);
+
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setIcon(R.mipmap.logo);
         actionBar.setTitle("Feeds");
+        feedsSaved = new ArrayList<>();
+        feedsSaved = dm.getAll();
 
     }
 
@@ -70,6 +77,12 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
             case R.id.dt_podcast:
                 typeFeeds="DTPOD";
                 new AsyncDTTrends(MainActivity.this).execute("http://www.digitaltrends.com/podcasts/feed/");
+                return true;
+            case R.id.get_fav:
+                typeFeeds = "FAV";
+                FeedAdaptor adaptor = new FeedAdaptor(MainActivity.this,R.layout.nasa_main,feedsSaved);
+                listView.setAdapter(adaptor);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -138,8 +151,13 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
                 for (Feed f : feeds) {
                     Log.d("ap", f.toString());
                 }
+                FeedAdaptor adaptor = null;
+                if(typeFeeds == "FAV"){
 
-                FeedAdaptor adaptor = new FeedAdaptor(MainActivity.this,R.layout.nasa_main,feeds);
+                    adaptor = new FeedAdaptor(MainActivity.this,R.layout.nasa_main,feedsSaved);
+                }else {
+                     adaptor = new FeedAdaptor(MainActivity.this, R.layout.nasa_main, feeds);
+                }
                 listView.setAdapter(adaptor);
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -147,8 +165,27 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Feed f = feeds.get(position);
                         Intent i = new Intent(MainActivity.this, ViewActivity.class);
-                        i.putExtra(FEED_SENT,f);
+                        i.putExtra(FEED_SENT, f);
                         startActivity(i);
+                    }
+                });
+
+                listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                        Feed feedClicked = feeds.get(position);
+                        Log.d("as",feedClicked.toString());
+                        Feed alreadySaved = dm.getFeed(feedClicked.getTitle());
+
+                        if(alreadySaved == null) {
+                            dm.saveFeed(feeds.get(position));
+                            Toast.makeText(MainActivity.this,"Saved",Toast.LENGTH_SHORT).show();
+                        }else {
+                            dm.deleteFeed(alreadySaved);
+                            Toast.makeText(MainActivity.this,"Deleted",Toast.LENGTH_SHORT).show();
+                        }
+
+                        return true;
                     }
                 });
 

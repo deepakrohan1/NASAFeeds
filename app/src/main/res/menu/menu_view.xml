@@ -29,4 +29,9 @@
         android:orderInCategory="100"
         app:showAsAction="collapseActionView"/>
 
+    <item android:id="@+id/get_fav"
+        android:icon="@drawable/comp"
+        android:title="Favourites"
+        android:orderInCategory="100"
+        app:showAsAction="collapseActionView"/>
 </menu>

@@ -3,6 +3,7 @@ package com.example.rohan.nasafeeds;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -32,7 +33,9 @@ TextView tvDesc;
             Feed f = (Feed) getIntent().getExtras().getSerializable(MainActivity.FEED_SENT);
             tvTitle.setText(f.getTitle());
             if(!f.getDescription().equals(null)){
-                tvDesc.setText(Html.fromHtml(f.getDescription())); //Aligns as per Html safe
+                //TODO: Yet the links wont work
+                tvDesc.setText(Html.fromHtml(f.getDescription()),TextView.BufferType.SPANNABLE); //Aligns as per Html safe
+                tvDesc.setMovementMethod(LinkMovementMethod.getInstance());//Makes the link active
             }
             Picasso.with(this).load(f.getImageLink()).into(imDetailed);
         }

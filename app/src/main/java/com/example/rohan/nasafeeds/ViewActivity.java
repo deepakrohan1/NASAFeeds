@@ -18,6 +18,11 @@ TextView tvDesc;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
 
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setIcon(R.mipmap.logo);
+        actionBar.setTitle("View Feed");
+
         tvTitle = (TextView) findViewById(R.id.textViewTitle);
         imDetailed = (ImageView)findViewById(R.id.imageViewDetailed);
         tvDesc = (TextView)findViewById(R.id.textViewDesc);

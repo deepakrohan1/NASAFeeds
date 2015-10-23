@@ -17,4 +17,16 @@
         android:orderInCategory="100"
         app:showAsAction="collapseActionView"/>
 
+    <item android:id="@+id/dt_mobile"
+        android:icon="@drawable/comp"
+        android:title="Mobile"
+        android:orderInCategory="100"
+        app:showAsAction="collapseActionView"/>
+
+    <item android:id="@+id/dt_podcast"
+        android:icon="@drawable/comp"
+        android:title="Podcasts"
+        android:orderInCategory="100"
+        app:showAsAction="collapseActionView"/>
+
 </menu>

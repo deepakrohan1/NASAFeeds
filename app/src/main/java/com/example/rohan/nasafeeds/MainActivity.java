@@ -1,5 +1,6 @@
 package com.example.rohan.nasafeeds;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -33,7 +34,10 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
         listView = (ListView)findViewById(R.id.listView);
         new NASAFeedParser().execute("http://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss");
 
-
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setIcon(R.mipmap.logo);
+        actionBar.setTitle("Feeds");
 
     }
 
@@ -59,6 +63,13 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
                 typeFeeds="DTCOMP";
                 new AsyncDTTrends(MainActivity.this).execute("http://www.digitaltrends.com/computing/feed/");
                 return true;
+            case R.id.dt_mobile:
+                typeFeeds="DTMOB";
+                new AsyncDTTrends(MainActivity.this).execute("http://www.digitaltrends.com/mobile/feed/");
+                return true;
+            case R.id.dt_podcast:
+                typeFeeds="DTPOD";
+                new AsyncDTTrends(MainActivity.this).execute("http://www.digitaltrends.com/podcasts/feed/");
             default:
                 return super.onOptionsItemSelected(item);
         }

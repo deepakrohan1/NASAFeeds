@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         switch (id){
-            case R.id.imageViewNasa:
+            case R.id.nasa_image:
                 typeFeeds = "NASA";
                 new NASAFeedParser().execute("http://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss");
                 return true;

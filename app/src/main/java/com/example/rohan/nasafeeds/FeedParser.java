@@ -72,13 +72,15 @@ public class FeedParser {
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
             super.endElement(uri, localName, qName);
-            if (localName.equals("item")){
+            if (localName.equals("item")) {
                 feedsList.add(feeds);
-            } else if ((localName.equals("title")) || (localName.equals("channel"))) {
+            }else if(localName.equals("link")){
+                feeds.setLink(sb.toString().trim());
+            } else if ((localName.equals("title"))) {
                 feeds.setTitle(sb.toString().trim());
-            } else if ((localName.equals("description")) || (localName.equals("channel"))) {
+            } else if ((localName.equals("description"))) {
                 feeds.setDescription(sb.toString().trim());
-            } else if ((localName.equals("pubDate")) || (localName.equals("channel"))){
+            } else if ((localName.equals("pubDate"))){
                 feeds.setDate(sb.toString().trim());
             }
             sb.setLength(0);

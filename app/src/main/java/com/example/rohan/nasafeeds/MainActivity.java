@@ -1,6 +1,8 @@
 package com.example.rohan.nasafeeds;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -24,12 +26,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.Manifest;
 
 public class MainActivity extends AppCompatActivity implements AsyncDTTrends.showData {
     List<Feed> feedsSaved;
     ListView listView;
     String typeFeeds = "NASA";
     FeedDataManager dm;
+    AlertDialog alert;
+    CharSequence[] items;
     public static final String FEED_SENT="feedsent";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,10 +155,26 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
             if (feeds.size() == 0) {
                 Log.d("ap", "Err");
             } else {
+                ArrayList<String> feedsTitle = new ArrayList<>();
                 for (Feed f : feeds) {
                     Log.d("ap", f.toString());
+                    feedsTitle.add(f.getTitle());
                 }
                 FeedAdaptor adaptor = null;
+                items = feedsTitle.toArray(new CharSequence[feedsTitle.size()]);
+
+//                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//                builder.setTitle("Add as Fav")
+//                        .setP
+//                builder.setItems(items, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        Toast.makeText(MainActivity.this, "Selected Item: " + items[which], Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+
+//                alert = builder.create();
+
                 if(typeFeeds == "FAV"){
 
                     adaptor = new FeedAdaptor(MainActivity.this,R.layout.nasa_main,feedsSaved);
@@ -179,22 +200,43 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
                     }
                 });
 
+
                 listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                     @Override
                     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                         Feed feedClicked = feeds.get(position);
                         Log.d("as", feedClicked.toString());
-                        Feed alreadySaved = dm.getFeed(feedClicked.getTitle());
-                        ImageView star = (ImageView) view.findViewById(R.id.imageViewFav);
-                        if (alreadySaved == null) {
-                            dm.saveFeed(feeds.get(position));
-                            star.setImageDrawable(getResources().getDrawable(R.drawable.fill));
-                            Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_SHORT).show();
-                        } else {
-                            dm.deleteFeed(alreadySaved);
-                            Toast.makeText(MainActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
-                            star.setImageDrawable(getResources().getDrawable(R.drawable.empty));
-                        }
+                        final int positionVar = position;
+                       final Feed alreadySaved = dm.getFeed(feedClicked.getTitle());
+                        final ImageView star = (ImageView) view.findViewById(R.id.imageViewFav);
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setTitle("Add as Fav")
+                                .setMessage("This will either Add/Delete Content from the Favourites")
+                                .setCancelable(false)
+                                .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (alreadySaved == null) {
+                                            dm.saveFeed(feeds.get(positionVar));
+                                            star.setImageDrawable(getResources().getDrawable(R.drawable.fill));
+                                            Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            dm.deleteFeed(alreadySaved);
+                                            Toast.makeText(MainActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                                            star.setImageDrawable(getResources().getDrawable(R.drawable.empty));
+                                        }
+                                    }
+                                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        });
+                        alert = builder.create();
+                        alert.show();
+
+
                         return true;
                     }
                 });

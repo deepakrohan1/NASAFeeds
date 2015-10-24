@@ -21,12 +21,14 @@ public class FeedAdaptor extends ArrayAdapter<Feed> {
     Context mContext;
     int mResource;
     List<Feed> mObjects;
+    FeedDataManager fm;
 
     public FeedAdaptor(Context context, int resource, List<Feed> objects) {
         super(context, resource, objects);
         this.mContext = context;
         this.mResource = resource;
         this.mObjects = objects;
+        fm = new FeedDataManager(this.mContext);
     }
 
     @Override
@@ -37,13 +39,22 @@ public class FeedAdaptor extends ArrayAdapter<Feed> {
         }
         Feed f = mObjects.get(position);
         ImageView imageView = (ImageView)convertView.findViewById(R.id.imageViewNasa);
-        Picasso.with(mContext).load(f.getImageLink()).resize(100,100).into(imageView);
+        Picasso.with(mContext).load(f.getImageLink()).resize(100, 100).into(imageView);
 
         TextView tvTitle = (TextView)convertView.findViewById(R.id.textViewTitle);
         tvTitle.setText(f.getTitle());
 
         TextView tvDate = (TextView)convertView.findViewById(R.id.textViewPubDate);
         tvDate.setText(f.getDate());
+
+        ImageView fav = (ImageView)convertView.findViewById(R.id.imageViewFav);
+
+        Feed loadingFeed = fm.getFeed(mObjects.get(position).getTitle());
+        if(loadingFeed != null) {
+            fav.setImageDrawable(mContext.getResources().getDrawable(R.drawable.fill));
+        }else{
+            fav.setImageDrawable(mContext.getResources().getDrawable(R.drawable.empty));
+        }
 
         return convertView;
     }

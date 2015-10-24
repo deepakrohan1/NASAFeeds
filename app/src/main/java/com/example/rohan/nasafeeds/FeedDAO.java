@@ -30,7 +30,7 @@ public class FeedDAO {
     }
 
     public boolean deleteNote(Feed feed){
-        return db.delete(FeedTable.TABLE_NAME,FeedTable.COLUMN_DATE +"=?",new String[]{feed.getDate()}) > 0;
+        return db.delete(FeedTable.TABLE_NAME,FeedTable.COLUMN_TITLE +"=?",new String[]{feed.getTitle()}) > 0;
     }
 
     public Feed getFeed(String title){

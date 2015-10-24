@@ -26,4 +26,12 @@
         android:id="@+id/textViewPubDate"
         android:layout_alignBottom="@+id/imageViewNasa"
         android:layout_toEndOf="@+id/imageViewNasa" />
+
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:id="@+id/imageViewFav"
+        android:layout_above="@+id/textViewPubDate"
+        android:layout_toEndOf="@+id/imageViewNasa"
+        android:src="@drawable/empty" />
 </RelativeLayout>

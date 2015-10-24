@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
                 return true;
             case R.id.get_fav:
                 typeFeeds = "FAV";
+                feedsSaved = dm.getAll();
                 FeedAdaptor adaptor = new FeedAdaptor(MainActivity.this,R.layout.nasa_main,feedsSaved);
                 listView.setAdapter(adaptor);
                 return true;
@@ -159,14 +161,21 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
                      adaptor = new FeedAdaptor(MainActivity.this, R.layout.nasa_main, feeds);
                 }
                 listView.setAdapter(adaptor);
-
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Feed f = feeds.get(position);
-                        Intent i = new Intent(MainActivity.this, ViewActivity.class);
-                        i.putExtra(FEED_SENT, f);
-                        startActivity(i);
+                        if (typeFeeds == "FAV") {
+                            Feed f = feedsSaved.get(position);
+                            Intent i = new Intent(MainActivity.this, ViewActivity.class);
+                            i.putExtra(FEED_SENT, f);
+                            startActivity(i);
+
+                        } else {
+                            Feed f = feeds.get(position);
+                            Intent i = new Intent(MainActivity.this, ViewActivity.class);
+                            i.putExtra(FEED_SENT, f);
+                            startActivity(i);
+                        }
                     }
                 });
 
@@ -174,17 +183,18 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
                     @Override
                     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                         Feed feedClicked = feeds.get(position);
-                        Log.d("as",feedClicked.toString());
+                        Log.d("as", feedClicked.toString());
                         Feed alreadySaved = dm.getFeed(feedClicked.getTitle());
-
-                        if(alreadySaved == null) {
+                        ImageView star = (ImageView) view.findViewById(R.id.imageViewFav);
+                        if (alreadySaved == null) {
                             dm.saveFeed(feeds.get(position));
-                            Toast.makeText(MainActivity.this,"Saved",Toast.LENGTH_SHORT).show();
-                        }else {
+                            star.setImageDrawable(getResources().getDrawable(R.drawable.fill));
+                            Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_SHORT).show();
+                        } else {
                             dm.deleteFeed(alreadySaved);
-                            Toast.makeText(MainActivity.this,"Deleted",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                            star.setImageDrawable(getResources().getDrawable(R.drawable.empty));
                         }
-
                         return true;
                     }
                 });

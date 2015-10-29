@@ -35,16 +35,16 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
     FeedDataManager dm;
     AlertDialog alert;
     CharSequence[] items;
-    public static final String FEED_SENT="feedsent";
+    List<Feed> allFeeds;
+    public static final String FEED_SENT = "feedsent";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        listView = (ListView)findViewById(R.id.listView);
+        listView = (ListView) findViewById(R.id.listView);
         new NASAFeedParser().execute("http://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss");
-
         dm = new FeedDataManager(this);
-
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setIcon(R.mipmap.logo);
@@ -67,27 +67,27 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        switch (id){
+        switch (id) {
             case R.id.nasa_image:
                 typeFeeds = "NASA";
                 new NASAFeedParser().execute("http://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss");
                 return true;
             case R.id.dt_computer:
-                typeFeeds="DTCOMP";
+                typeFeeds = "DTCOMP";
                 new AsyncDTTrends(MainActivity.this).execute("http://www.digitaltrends.com/computing/feed/");
                 return true;
             case R.id.dt_mobile:
-                typeFeeds="DTMOB";
+                typeFeeds = "DTMOB";
                 new AsyncDTTrends(MainActivity.this).execute("http://www.digitaltrends.com/mobile/feed/");
                 return true;
             case R.id.dt_podcast:
-                typeFeeds="DTPOD";
+                typeFeeds = "DTPOD";
                 new AsyncDTTrends(MainActivity.this).execute("http://www.digitaltrends.com/podcasts/feed/");
                 return true;
             case R.id.get_fav:
                 typeFeeds = "FAV";
                 feedsSaved = dm.getAll();
-                FeedAdaptor adaptor = new FeedAdaptor(MainActivity.this,R.layout.nasa_main,feedsSaved);
+                FeedAdaptor adaptor = new FeedAdaptor(MainActivity.this, R.layout.nasa_main, feedsSaved);
                 listView.setAdapter(adaptor);
                 return true;
             default:
@@ -98,25 +98,10 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
 
     @Override
     public void showsFeeds(final ArrayList<Feed> feeds) {
-        if(feeds == null){
-            Log.d("ap","error");
-        }else{
-            for(Feed f : feeds){
-                Log.d("ap",f.toString());
-            }
-
-            FeedAdaptor feedAdaptor = new FeedAdaptor(MainActivity.this,R.layout.nasa_main,feeds);
-            listView.setAdapter(feedAdaptor);
-
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Feed feed = feeds.get(position);
-                    Intent i = new Intent(MainActivity.this,ViewActivity.class);
-                    i.putExtra(FEED_SENT,feed);
-                    startActivity(i);
-                }
-            });
+        if (feeds == null) {
+            Log.d("ap", "error");
+        } else {
+            populateListView(feeds);
         }
     }
 
@@ -150,99 +135,87 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
         }
 
         @Override
-        protected void onPostExecute(final ArrayList<Feed> feeds) {
+        protected void onPostExecute(ArrayList<Feed> feeds) {
             super.onPostExecute(feeds);
             if (feeds.size() == 0) {
                 Log.d("ap", "Err");
             } else {
-                ArrayList<String> feedsTitle = new ArrayList<>();
-                for (Feed f : feeds) {
-                    Log.d("ap", f.toString());
-                    feedsTitle.add(f.getTitle());
-                }
-                FeedAdaptor adaptor = null;
-                items = feedsTitle.toArray(new CharSequence[feedsTitle.size()]);
-
-//                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-//                builder.setTitle("Add as Fav")
-//                        .setP
-//                builder.setItems(items, new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        Toast.makeText(MainActivity.this, "Selected Item: " + items[which], Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-
-//                alert = builder.create();
-
-                if(typeFeeds == "FAV"){
-
-                    adaptor = new FeedAdaptor(MainActivity.this,R.layout.nasa_main,feedsSaved);
-                }else {
-                     adaptor = new FeedAdaptor(MainActivity.this, R.layout.nasa_main, feeds);
-                }
-                listView.setAdapter(adaptor);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        if (typeFeeds == "FAV") {
-                            Feed f = feedsSaved.get(position);
-                            Intent i = new Intent(MainActivity.this, ViewActivity.class);
-                            i.putExtra(FEED_SENT, f);
-                            startActivity(i);
-
-                        } else {
-                            Feed f = feeds.get(position);
-                            Intent i = new Intent(MainActivity.this, ViewActivity.class);
-                            i.putExtra(FEED_SENT, f);
-                            startActivity(i);
-                        }
-                    }
-                });
-
-
-                listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                    @Override
-                    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                        Feed feedClicked = feeds.get(position);
-                        Log.d("as", feedClicked.toString());
-                        final int positionVar = position;
-                       final Feed alreadySaved = dm.getFeed(feedClicked.getTitle());
-                        final ImageView star = (ImageView) view.findViewById(R.id.imageViewFav);
-
-                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                        builder.setTitle("Add as Fav")
-                                .setMessage("This will either Add/Delete Content from the Favourites")
-                                .setCancelable(false)
-                                .setPositiveButton("Add", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        if (alreadySaved == null) {
-                                            dm.saveFeed(feeds.get(positionVar));
-                                            star.setImageDrawable(getResources().getDrawable(R.drawable.fill));
-                                            Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            dm.deleteFeed(alreadySaved);
-                                            Toast.makeText(MainActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
-                                            star.setImageDrawable(getResources().getDrawable(R.drawable.empty));
-                                        }
-                                    }
-                                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        });
-                        alert = builder.create();
-                        alert.show();
-
-
-                        return true;
-                    }
-                });
-
+                populateListView(feeds);
             }
         }
+
+    }
+
+
+    public void populateListView(final ArrayList<Feed> feeds) {
+
+        FeedAdaptor adaptor = null;
+
+        if (typeFeeds == "FAV") {
+            adaptor = new FeedAdaptor(MainActivity.this, R.layout.nasa_main, feedsSaved);
+        } else {
+            adaptor = new FeedAdaptor(MainActivity.this, R.layout.nasa_main, feeds);
+        }
+        listView.setAdapter(adaptor);
+        adaptor.setNotifyOnChange(true);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (typeFeeds == "FAV") {
+                    Feed f = feedsSaved.get(position);
+                    Intent i = new Intent(MainActivity.this, ViewActivity.class);
+                    i.putExtra(FEED_SENT, f);
+                    startActivity(i);
+                } else {
+                    Feed f = feeds.get(position);
+                    Intent i = new Intent(MainActivity.this, ViewActivity.class);
+                    i.putExtra(FEED_SENT, f);
+                    startActivity(i);
+                }
+            }
+        });
+
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                final Feed feedClicked = feeds.get(position);
+                Log.d("as", feedClicked.toString());
+                final int positionVar = position;
+                final Feed alreadySaved = dm.getFeed(feedClicked.getTitle());
+                final ImageView star = (ImageView) view.findViewById(R.id.imageViewFav);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Add as Fav")
+                        .setMessage("This will either Add/Delete Content from the Favourites")
+                        .setCancelable(false)
+                        .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (alreadySaved == null) {
+                                    dm.saveFeed(feeds.get(positionVar));
+                                    star.setImageDrawable(getResources().getDrawable(R.drawable.fill));
+                                    Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    dm.deleteFeed(alreadySaved);
+                                    Toast.makeText(MainActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                                    star.setImageDrawable(getResources().getDrawable(R.drawable.empty));
+                                }
+                            }
+                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                alert = builder.create();
+                alert.show();
+                return true;
+            }
+        });
+
+
     }
 
 }

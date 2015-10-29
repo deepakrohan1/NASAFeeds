@@ -122,10 +122,43 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
         if (feeds == null) {
             Log.d("ap", "error");
         } else {
-
-
-
-
+            for(final Feed f:feeds) {
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("FeedObject");
+                query.whereEqualTo(TITLE, f.getTitle());
+                query.findInBackground(new FindCallback<ParseObject>() {
+                    public void done(List<ParseObject> scoreList, ParseException e) {
+                        if (e == null) {
+                            if (scoreList.size() > 0) {
+                                Log.d("as", "already stored in database : " + f.toString());
+                            } else {
+                                ParseObject parseObject = new ParseObject("FeedObject");
+                                parseObject.put(TITLE, f.getTitle());
+                                parseObject.put(DATE, f.getDate());
+                                parseObject.put(URL, f.getLink());
+                                parseObject.put(IMAGE, f.getImageLink());
+                                if (typeFeeds == "DTCOMP") {
+                                    parseObject.put(SUB_CATEGORY, "computerDT");
+                                } else if (typeFeeds == "DTMOB") {
+                                    parseObject.put(SUB_CATEGORY, "mobilesDT");
+                                } else if (typeFeeds == "DTPOD") {
+                                    parseObject.put(SUB_CATEGORY, "podcastsDT");
+                                } else if (typeFeeds == "NASA") {
+                                    parseObject.put(SUB_CATEGORY, "imageDay");
+                                }
+                                parseObject.put(DESCRIPTION, f.getDescription());
+                                parseObject.put(FEED_SENT, TYPE_FEED_NASA);
+                                try {
+                                    parseObject.save();
+                                } catch (ParseException r) {
+                                    r.printStackTrace();
+                                }
+                            }
+                        } else {
+                            Log.d("score", "Error: " + e.getMessage());
+                        }
+                    }
+                });
+            }
             populateListView(feeds);
         }
     }

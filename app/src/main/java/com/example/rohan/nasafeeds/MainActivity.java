@@ -17,6 +17,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.parse.Parse;
+import com.parse.ParseObject;
+
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -43,6 +46,13 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         listView = (ListView) findViewById(R.id.listView);
+        ParseExample parseExample = new ParseExample();
+
+        ParseObject testObject = new ParseObject("TestObject");
+        testObject.put("foo", "bar");
+        testObject.saveInBackground();
+
+
         new NASAFeedParser().execute("http://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss");
         dm = new FeedDataManager(this);
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();

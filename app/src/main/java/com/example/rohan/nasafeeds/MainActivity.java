@@ -17,8 +17,11 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import org.xml.sax.SAXException;
 
@@ -40,6 +43,14 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
     CharSequence[] items;
     List<Feed> allFeeds;
     public static final String FEED_SENT = "feedsent";
+    public static final String TYPE_FEED_NASA = "nasa";
+    public static final String SUB_CATEGORY = "category";
+
+    public static final String TITLE = "title";
+    public static final String IMAGE = "image";
+    public static final String URL = "url";
+    public static final String DESCRIPTION = "description";
+    public static final String DATE = "date";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +122,10 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
         if (feeds == null) {
             Log.d("ap", "error");
         } else {
+
+
+
+
             populateListView(feeds);
         }
     }
@@ -150,7 +165,44 @@ public class MainActivity extends AppCompatActivity implements AsyncDTTrends.sho
             if (feeds.size() == 0) {
                 Log.d("ap", "Err");
             } else {
-                populateListView(feeds);
+                //NASA Feeds
+
+
+
+                for(final Feed f : feeds) {
+
+                    ParseQuery<ParseObject> query = ParseQuery.getQuery("FeedObject");
+                    query.whereEqualTo(TITLE, f.getTitle());
+                    query.findInBackground(new FindCallback<ParseObject>() {
+                        public void done(List<ParseObject> scoreList, ParseException e) {
+                            if (e == null) {
+                                if (scoreList.size() > 0) {
+                                    Log.d("as", "already stored in database : "+f.toString());
+                                } else {
+                                    ParseObject parseObject = new ParseObject("FeedObject");
+                                    parseObject.put(TITLE, f.getTitle());
+                                    parseObject.put(DATE, f.getDate());
+                                    parseObject.put(URL, f.getLink());
+                                    parseObject.put(IMAGE, f.getImageLink());
+                                    parseObject.put(SUB_CATEGORY, "imageDay");
+                                    parseObject.put(DESCRIPTION, f.getDescription());
+                                    parseObject.put(FEED_SENT, TYPE_FEED_NASA);
+                                    try {
+                                        parseObject.save();
+                                    } catch (ParseException r) {
+                                        r.printStackTrace();
+                                    }
+                                }
+
+                            } else {
+                                Log.d("score", "Error: " + e.getMessage());
+                            }
+                        }
+                    });
+
+
+                    populateListView(feeds);
+                }
             }
         }
 
